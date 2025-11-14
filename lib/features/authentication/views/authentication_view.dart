@@ -20,6 +20,8 @@ class _LoginViewState extends State<LoginView>
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  final _formKey = GlobalKey<FormState>();
+
   late AnimationController _controller;
   late Animation<double> _fadeIn;
 
@@ -107,77 +109,99 @@ class _LoginViewState extends State<LoginView>
                           ),
                         ),
 
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ShaderMask(
-                              shaderCallback: (bounds) => const LinearGradient(
-                                colors: [Color(0xFF4FACFE), Color(0xFF00F2FE)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ).createShader(bounds),
-                              child: const CustomText(
-                                title: "Welcome Back 👋",
-                                fontSize: 30,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ShaderMask(
+                                shaderCallback: (bounds) =>
+                                    const LinearGradient(
+                                      colors: [
+                                        Color(0xFF4FACFE),
+                                        Color(0xFF00F2FE),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ).createShader(bounds),
+                                child: const CustomText(
+                                  title: "Welcome Back 👋",
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
 
-                            verticalSpace(8),
+                              verticalSpace(8),
 
-                            const CustomText(
-                              title: "Login to continue",
-                              fontSize: 15,
-                              color: Colors.white70,
-                            ),
+                              const CustomText(
+                                title: "Login to continue",
+                                fontSize: 15,
+                                color: Colors.white70,
+                              ),
 
-                            verticalSpace(35),
-                            CustomTextField(
-                              controller: emailController,
-                              hintText: "Email",
-                              keyboardType: TextInputType.emailAddress,
-                            ),
+                              verticalSpace(35),
+                              CustomTextField(
+                                controller: emailController,
+                                hintText: "Email",
+                                keyboardType: TextInputType.emailAddress,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                              ),
 
-                            verticalSpace(20),
-                            CustomTextField(
-                              controller: passwordController,
-                              hintText: "Password",
-                              obscureText: true,
-                            ),
+                              verticalSpace(20),
+                              CustomTextField(
+                                controller: passwordController,
+                                hintText: "Password",
+                                obscureText: true,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                              ),
 
-                            verticalSpace(30),
-                            BlocBuilder<
-                              AuthenticationBloc,
-                              AuthenticationState
-                            >(
-                              builder: (context, state) {
-                                return CustomIconButton(
-                                  text: "Login",
-                                  maxSize: const Size(double.infinity, 51),
-                                  minSize: const Size(double.infinity, 51),
-                                  backgroundColor: const Color(
-                                    0xFF3B82F6,
-                                  ).withValues(alpha: 0.85),
-                                  textColor: Colors.white,
-                                  onPressed: () {
-                                    context.read<AuthenticationBloc>().add(
-                                      LoginEvent(
-                                        email: emailController.text,
-                                        password: passwordController.text,
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                            verticalSpace(20),
-                            const CustomText(
-                              title: "Forgot password? Contact admin to reset.",
-                              fontSize: 13,
-                              color: Colors.white54,
-                            ),
-                          ],
+                              verticalSpace(30),
+                              BlocBuilder<
+                                AuthenticationBloc,
+                                AuthenticationState
+                              >(
+                                builder: (context, state) {
+                                  return CustomIconButton(
+                                    text: "Login",
+                                    maxSize: const Size(double.infinity, 51),
+                                    minSize: const Size(double.infinity, 51),
+                                    backgroundColor: const Color(
+                                      0xFF3B82F6,
+                                    ).withValues(alpha: 0.85),
+                                    textColor: Colors.white,
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        context.read<AuthenticationBloc>().add(
+                                          LoginEvent(
+                                            email: emailController.text,
+                                            password: passwordController.text,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
+                              verticalSpace(20),
+                              const CustomText(
+                                title:
+                                    "Forgot password? Contact admin to reset.",
+                                fontSize: 13,
+                                color: Colors.white54,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

@@ -39,7 +39,8 @@ final List<ProductModel> mockProducts = [
       'https://dummyjson.com/image/i/products/1/1.jpg',
       'https://dummyjson.com/image/i/products/1/2.jpg',
     ],
-    thumbnail: 'https://dummyjson.com/image/i/products/1/thumbnail.jpg',
+    thumbnail:
+        'https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp',
   ),
 
   ProductModel(
@@ -81,7 +82,8 @@ final List<ProductModel> mockProducts = [
       'https://dummyjson.com/image/i/products/2/1.jpg',
       'https://dummyjson.com/image/i/products/2/2.jpg',
     ],
-    thumbnail: 'https://dummyjson.com/image/i/products/2/thumbnail.jpg',
+    thumbnail:
+        'https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp',
   ),
 
   ProductModel(
@@ -122,7 +124,8 @@ final List<ProductModel> mockProducts = [
       'https://dummyjson.com/image/i/products/3/1.jpg',
       'https://dummyjson.com/image/i/products/3/2.jpg',
     ],
-    thumbnail: 'https://dummyjson.com/image/i/products/3/thumbnail.jpg',
+    thumbnail:
+        'https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp',
   ),
 
   ProductModel(
@@ -164,7 +167,8 @@ final List<ProductModel> mockProducts = [
       'https://dummyjson.com/image/i/products/4/1.jpg',
       'https://dummyjson.com/image/i/products/4/2.jpg',
     ],
-    thumbnail: 'https://dummyjson.com/image/i/products/4/thumbnail.jpg',
+    thumbnail:
+        'https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp',
   ),
 
   ProductModel(
@@ -205,6 +209,7 @@ final List<ProductModel> mockProducts = [
       'https://dummyjson.com/image/i/products/5/1.jpg',
       'https://dummyjson.com/image/i/products/5/2.jpg',
     ],
-    thumbnail: 'https://dummyjson.com/image/i/products/5/thumbnail.jpg',
+    thumbnail:
+        'https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp',
   ),
 ];
