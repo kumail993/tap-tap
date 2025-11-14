@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,7 +6,9 @@ import 'package:tap_task/core/widgets/custom_skeleton.dart';
 import 'package:tap_task/core/widgets/custom_text.dart';
 import 'package:tap_task/core/widgets/sizedbox.dart';
 import 'package:tap_task/features/products/bloc/products_bloc.dart';
-import 'package:tap_task/features/products/widgets/custom_form_field.dart';
+import 'package:tap_task/features/products/widgets/add_products_dialogue.dart';
+import 'package:tap_task/features/products/widgets/glass_button.dart';
+import 'package:tap_task/features/products/widgets/glass_panel.dart';
 import 'package:tap_task/features/products/widgets/products_card.dart';
 
 class ProductsView extends StatefulWidget {
@@ -81,15 +82,15 @@ class _ProductsViewState extends State<ProductsView> {
                                   color: Colors.white,
                                 ),
                                 const Spacer(),
-                                _glassButton(
+                                GlassButton(
                                   text: "Add Product",
-                                  onTap: () => _showAddProductDialog(context),
+                                  onTap: () => showAddProductDialog(context),
                                 ),
                               ],
                             ),
 
                             verticalSpace(20),
-                            _glassPanel(
+                            GlassPanel(
                               child: CustomSearchField(
                                 controller: searchCtrl,
                                 placeholder:
@@ -101,7 +102,7 @@ class _ProductsViewState extends State<ProductsView> {
 
                             verticalSpace(25),
                             Expanded(
-                              child: _glassPanel(
+                              child: GlassPanel(
                                 padding: const EdgeInsets.all(20),
                                 child: GridView.builder(
                                   shrinkWrap: true,
@@ -148,198 +149,6 @@ class _ProductsViewState extends State<ProductsView> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _glassPanel({
-    required Widget child,
-    EdgeInsets padding = const EdgeInsets.all(16),
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withValues(alpha: 0.08),
-                Colors.white.withValues(alpha: 0.03),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-
-  Widget _glassButton({required String text, required VoidCallback onTap}) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
-      onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.withValues(alpha: 0.15),
-                  Colors.white.withValues(alpha: 0.05),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.add_rounded, color: Colors.white, size: 20),
-                horizontalSpace(10),
-                CustomText(
-                  title: text,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showAddProductDialog(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
-    final nameCtrl = TextEditingController();
-    final categoryCtrl = TextEditingController();
-    final priceCtrl = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
-              child: Container(
-                width: 420,
-                padding: const EdgeInsets.all(22),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.18),
-                  ),
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.white.withValues(alpha: 0.12),
-                      Colors.white.withValues(alpha: 0.05),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CustomText(
-                      title: 'Add Product',
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-
-                    verticalSpace(22),
-
-                    Form(
-                      key: formKey,
-                      child: Column(
-                        children: [
-                          CustomTextFormField(
-                            controller: nameCtrl,
-                            label: 'Product Name',
-
-                            validator: (v) =>
-                                v!.isEmpty ? "Enter product name" : null,
-                          ),
-                          verticalSpace(16),
-
-                          CustomTextFormField(
-                            controller: categoryCtrl,
-                            label: 'Category',
-                            validator: (v) =>
-                                v!.isEmpty ? "Enter category" : null,
-                          ),
-                          verticalSpace(16),
-
-                          CustomTextFormField(
-                            controller: priceCtrl,
-                            label: 'Price',
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Enter price';
-                              }
-                              if (double.tryParse(value) == null) {
-                                return 'Invalid number';
-                              }
-                              return null;
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    verticalSpace(20),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _glassButton(
-                            text: "Cancel",
-                            onTap: () => Navigator.pop(context),
-                          ),
-                        ),
-                        horizontalSpace(16),
-                        Expanded(
-                          child: _glassButton(
-                            text: "Add",
-                            onTap: () {
-                              if (!formKey.currentState!.validate()) return;
-
-                              context.read<ProductsBloc>().add(
-                                AddProductEvent(
-                                  name: nameCtrl.text.trim(),
-                                  category: categoryCtrl.text.trim(),
-                                  price: priceCtrl.text.trim(),
-                                ),
-                              );
-
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }

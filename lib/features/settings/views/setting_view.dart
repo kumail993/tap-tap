@@ -1,45 +1,32 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:tap_task/core/widgets/custom_text.dart';
 import 'package:tap_task/core/widgets/custom_button.dart';
 import 'package:tap_task/core/widgets/sizedbox.dart';
+import 'package:tap_task/features/products/widgets/glass_panel.dart';
+import 'package:tap_task/features/settings/widgets/glass_action_tile.dart';
+import 'package:tap_task/features/settings/widgets/glass_dropdown.dart';
+import 'package:tap_task/features/settings/widgets/glass_switch.dart';
+import 'package:tap_task/features/settings/widgets/glass_textfield.dart';
+import 'package:tap_task/features/settings/widgets/section_title.dart';
+import 'package:tap_task/features/settings/widgets/setting_header.dart';
 
-Widget glassPanel({
-  required Widget child,
-  EdgeInsets padding = const EdgeInsets.all(16),
-}) {
-  return ClipRRect(
-    borderRadius: BorderRadius.circular(24),
-    child: BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-      child: Container(
-        padding: padding,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.18)),
-          gradient: LinearGradient(
-            colors: [
-              Colors.white.withOpacity(0.08),
-              Colors.white.withOpacity(0.02),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: child,
-      ),
-    ),
-  );
+class SettingsView extends StatefulWidget {
+  const SettingsView({super.key});
+
+  @override
+  State<SettingsView> createState() => _SettingsViewState();
 }
 
-class SettingsView extends StatelessWidget {
-  const SettingsView({super.key});
+class _SettingsViewState extends State<SettingsView> {
+  String themeValue = "System";
+  String densityValue = "Comfortable";
+  bool emailAlerts = true;
+  bool pushNotifications = false;
+  bool stockAlerts = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        // Background same as ProductsView
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF0F172A), Color(0xFF020617)],
@@ -60,116 +47,118 @@ class SettingsView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildHeader(),
+                      const SettingsHeader(
+                        title: "Settings",
+                        subtitle: "Manage your account settings",
+                      ),
                       verticalSpace(25),
-
-                      // ------------------------------------------------------------
-                      // PROFILE SETTINGS
-                      // ------------------------------------------------------------
-                      glassPanel(
+                      GlassPanel(
                         padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _sectionTitle("Profile Settings"),
+                            SectionTitle(title: 'Profile Settuing'),
                             verticalSpace(16),
-                            _buildTextField(
-                              "Full Name",
-                              "Enter your full name",
+                            const GlassTextField(
+                              label: "Full Name",
+                              placeholder: "Enter your full name",
                             ),
                             verticalSpace(12),
-                            _buildTextField("Email Address", "Enter email"),
+                            const GlassTextField(
+                              label: "Email Address",
+                              placeholder: "Enter email",
+                            ),
                             verticalSpace(12),
-                            _buildTextField(
-                              "Change Password",
-                              "Enter new password",
+                            const GlassTextField(
+                              label: "Change Password",
+                              placeholder: "Enter new password",
                               obscureText: true,
                             ),
                           ],
                         ),
                       ),
                       verticalSpace(20),
-
-                      // ------------------------------------------------------------
-                      // APP DISPLAY SETTINGS
-                      // ------------------------------------------------------------
-                      glassPanel(
+                      GlassPanel(
                         padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _sectionTitle("App Display"),
+                            SectionTitle(title: 'App Display'),
                             verticalSpace(16),
-                            _buildDropdown(
+                            GlassDropdown(
                               label: "Theme",
                               items: const ["System", "Light", "Dark"],
-                              onChanged: (_) {},
+                              value: themeValue,
+                              onChanged: (v) {
+                                setState(() => themeValue = v!);
+                              },
                             ),
                             verticalSpace(16),
-                            _buildDropdown(
+                            GlassDropdown(
                               label: "Layout Density",
                               items: const ["Comfortable", "Compact"],
-                              onChanged: (_) {},
+                              value: densityValue,
+                              onChanged: (v) {
+                                setState(() => densityValue = v!);
+                              },
                             ),
                           ],
                         ),
                       ),
                       verticalSpace(20),
-
-                      // ------------------------------------------------------------
-                      // NOTIFICATION SETTINGS
-                      // ------------------------------------------------------------
-                      glassPanel(
+                      GlassPanel(
                         padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _sectionTitle("Notifications"),
+                            SectionTitle(title: 'Notifications'),
                             verticalSpace(10),
-                            _buildSwitchTile(
+                            GlassSwitchTile(
                               title: "Email Alerts",
                               subtitle:
                                   "Receive email notifications for updates",
-                              value: true,
-                              onChanged: (_) {},
+                              value: emailAlerts,
+                              onChanged: (v) {
+                                setState(() => emailAlerts = v);
+                              },
                             ),
                             verticalSpace(10),
-                            _buildSwitchTile(
+                            GlassSwitchTile(
                               title: "Push Notifications",
                               subtitle: "Receive push alerts about activities",
-                              value: false,
-                              onChanged: (_) {},
+                              value: pushNotifications,
+                              onChanged: (v) {
+                                setState(() => pushNotifications = v);
+                              },
                             ),
                             verticalSpace(10),
-                            _buildSwitchTile(
+                            GlassSwitchTile(
                               title: "Stock Alerts",
                               subtitle:
                                   "Notify me when products go out of stock",
-                              value: true,
-                              onChanged: (_) {},
+                              value: stockAlerts,
+                              onChanged: (v) {
+                                setState(() => stockAlerts = v);
+                              },
                             ),
                           ],
                         ),
                       ),
                       verticalSpace(20),
-
-                      // ------------------------------------------------------------
-                      // SYSTEM SETTINGS
-                      // ------------------------------------------------------------
-                      glassPanel(
+                      GlassPanel(
                         padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _sectionTitle("System Settings"),
+                            SectionTitle(title: 'System Settings'),
                             verticalSpace(10),
-                            _buildActionTile(
+                            GlassActionTile(
                               icon: Icons.delete_outline_rounded,
                               title: "Clear Cache",
                               onTap: () {},
                             ),
                             verticalSpace(10),
-                            _buildActionTile(
+                            GlassActionTile(
                               icon: Icons.restart_alt_rounded,
                               title: "Reset Application Data",
                               onTap: () {},
@@ -178,8 +167,6 @@ class SettingsView extends StatelessWidget {
                         ),
                       ),
                       verticalSpace(25),
-
-                      // SAVE BUTTON
                       Align(
                         alignment: Alignment.centerRight,
                         child: CustomIconButton(
@@ -191,218 +178,13 @@ class SettingsView extends StatelessWidget {
                           onPressed: () {},
                         ),
                       ),
-
-                      verticalSpace(30),
+                      verticalSpace(50),
                     ],
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  // ============================================================
-  // HEADER
-  // ============================================================
-  Widget _buildHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CustomText(
-          title: "Settings",
-          fontSize: 28,
-          fontWeight: FontWeight.w700,
-          color: Colors.white,
-        ),
-        verticalSpace(4),
-        CustomText(
-          title: "Customize your preferences and account details.",
-          fontSize: 13,
-          color: Colors.white.withOpacity(0.7),
-        ),
-      ],
-    );
-  }
-
-  // ============================================================
-  // SECTION TITLE
-  // ============================================================
-  Widget _sectionTitle(String title) {
-    return CustomText(
-      title: title,
-      fontSize: 16,
-      fontWeight: FontWeight.w700,
-      color: Colors.white.withOpacity(0.95),
-    );
-  }
-
-  // ============================================================
-  // TEXT FIELD
-  // ============================================================
-  Widget _buildTextField(
-    String label,
-    String placeholder, {
-    bool obscureText = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CustomText(
-          title: label,
-          fontSize: 13,
-          color: Colors.white.withOpacity(0.8),
-        ),
-        verticalSpace(6),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white.withOpacity(0.18)),
-                color: Colors.white.withOpacity(0.06),
-              ),
-              child: TextField(
-                obscureText: obscureText,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: placeholder,
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ============================================================
-  // DROPDOWN
-  // ============================================================
-  Widget _buildDropdown({
-    required String label,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CustomText(
-          title: label,
-          fontSize: 13,
-          color: Colors.white.withOpacity(0.8),
-        ),
-        verticalSpace(6),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.white.withOpacity(0.18)),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              dropdownColor: const Color(0xFF020617),
-              style: const TextStyle(color: Colors.white),
-              icon: Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: Colors.white.withOpacity(0.9),
-              ),
-              items: items
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
-              onChanged: onChanged,
-              value: items.first,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ============================================================
-  // SWITCH TILE
-  // ============================================================
-  Widget _buildSwitchTile({
-    required String title,
-    required String subtitle,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomText(
-                title: title,
-                fontSize: 14,
-                color: Colors.white.withOpacity(0.95),
-                fontWeight: FontWeight.w600,
-              ),
-              verticalSpace(2),
-              CustomText(
-                title: subtitle,
-                fontSize: 12,
-                color: Colors.white.withOpacity(0.6),
-              ),
-            ],
-          ),
-        ),
-        Switch(
-          value: value,
-          onChanged: onChanged,
-          activeThumbColor: Colors.white,
-          activeTrackColor: Colors.white.withOpacity(0.4),
-          inactiveThumbColor: Colors.grey,
-          inactiveTrackColor: Colors.white.withOpacity(0.15),
-        ),
-      ],
-    );
-  }
-
-  // ============================================================
-  // ACTION TILE
-  // ============================================================
-  Widget _buildActionTile({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: Colors.white.withOpacity(0.06),
-          border: Border.all(color: Colors.white.withOpacity(0.16)),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.white, size: 22),
-            horizontalSpace(12),
-            CustomText(
-              title: title,
-              fontSize: 14,
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-            const Spacer(),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: Colors.white.withOpacity(0.6),
-            ),
-          ],
         ),
       ),
     );

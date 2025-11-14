@@ -33,7 +33,6 @@ class GlassProductCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // IMAGE
               Expanded(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(14),
@@ -51,27 +50,19 @@ class GlassProductCard extends StatelessWidget {
               ),
 
               verticalSpace(12),
-
-              // TITLE
               CustomText(
                 title: product.title,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
-
               verticalSpace(6),
-
-              // CATEGORY
               CustomText(
                 title: product.category,
                 fontSize: 12,
                 color: Colors.white.withValues(alpha: 0.7),
               ),
-
               verticalSpace(10),
-
-              // PRICE
               Row(
                 children: [
                   CustomText(
@@ -80,10 +71,7 @@ class GlassProductCard extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
-
                   const Spacer(),
-
-                  // STOCK BADGE
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,

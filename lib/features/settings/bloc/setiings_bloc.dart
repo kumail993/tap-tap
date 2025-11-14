@@ -6,8 +6,6 @@ part 'setiings_state.dart';
 
 class SetiingsBloc extends Bloc<SetiingsEvent, SetiingsState> {
   SetiingsBloc() : super(SetiingsInitial()) {
-    on<SetiingsEvent>((event, emit) {
-      // TODO: implement event handler
-    });
+    on<SetiingsEvent>((event, emit) {});
   }
 }
