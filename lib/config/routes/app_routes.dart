@@ -8,6 +8,7 @@ import 'package:tap_task/features/dashboard/views/dashboard_view.dart';
 import 'package:tap_task/features/products/models/product_model.dart';
 import 'package:tap_task/features/products/views/product_details.dart';
 import 'package:tap_task/features/products/views/products_view.dart';
+import 'package:tap_task/features/settings/views/setting_view.dart';
 
 bool isUserLoggedIn() => SupabaseConfig.client.auth.currentUser != null;
 
@@ -36,7 +37,7 @@ final GoRouter router = GoRouter(
         ),
         GoRoute(
           path: '/dashboard/settings',
-          builder: (context, state) => const DashboardView(),
+          builder: (context, state) => const SettingsView(),
         ),
       ],
     ),

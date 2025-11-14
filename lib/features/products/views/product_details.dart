@@ -1,4 +1,5 @@
-import 'package:tap_task/core/imports/common_imports.dart';
+import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:tap_task/core/widgets/custom_text.dart';
 import 'package:tap_task/core/widgets/sizedbox.dart';
 import 'package:tap_task/features/products/models/product_model.dart';
@@ -10,219 +11,319 @@ class ProductDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 700;
+    final isMobile = MediaQuery.of(context).size.width < 900;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: const Color(0xFF0F172A),
 
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: isMobile
-                ? _buildMobileLayout(context)
-                : _buildWebLayout(context),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.17,
+              child: Image.network(product.thumbnail, fit: BoxFit.cover),
+            ),
+          ),
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF0F172A), Color(0xFF020617)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(28),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1400),
+                      child: isMobile
+                          ? _buildMobileLayout()
+                          : _buildDesktopLayout(),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 3,
+          child: Column(
+            children: [
+              _HeroImage(product.thumbnail),
+              verticalSpace(20),
+              _ThumbnailCarousel(product.images),
+              verticalSpace(30),
+              _DescriptionSection(product),
+              verticalSpace(40),
+              _ReviewsSection(product.reviews),
+            ],
+          ),
+        ),
+
+        horizontalSpace(40),
+        Expanded(flex: 2, child: _ProductInfoCard(product)),
+      ],
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return Column(
+      children: [
+        _HeroImage(product.thumbnail),
+        verticalSpace(15),
+        _ThumbnailCarousel(product.images),
+        verticalSpace(20),
+        _ProductInfoCard(product),
+        verticalSpace(25),
+        _DescriptionSection(product),
+        verticalSpace(40),
+        _ReviewsSection(product.reviews),
+      ],
+    );
+  }
+}
+
+class _HeroImage extends StatelessWidget {
+  final String url;
+  const _HeroImage(this.url);
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: Container(
+        height: 520,
+        decoration: BoxDecoration(
+          image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
+        ),
+      ),
+    );
+  }
+}
+
+class _ThumbnailCarousel extends StatelessWidget {
+  final List<String> images;
+  const _ThumbnailCarousel(this.images);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 85,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: images.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, i) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              width: 85,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(images[i]),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
           );
         },
       ),
     );
   }
+}
 
-  Widget _buildWebLayout(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          flex: 2,
+class _ProductInfoCard extends StatelessWidget {
+  final ProductModel product;
+  const _ProductInfoCard(this.product);
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+        child: Container(
+          padding: const EdgeInsets.all(26),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.12),
+                Colors.white.withValues(alpha: 0.05),
+              ],
+            ),
+          ),
+
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AspectRatio(
-                aspectRatio: 1,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(product.thumbnail, fit: BoxFit.cover),
-                ),
-              ),
-              verticalSpace(10),
-              _buildThumbnailGallery(),
-            ],
-          ),
-        ),
-
-        verticalSpace(30),
-        Expanded(flex: 3, child: _buildDetailsCard()),
-      ],
-    );
-  }
-
-  Widget _buildMobileLayout(BuildContext context) {
-    return Column(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.network(
-            product.thumbnail,
-            height: 250,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
-        ),
-
-        verticalSpace(10),
-        _buildThumbnailGallery(),
-        verticalSpace(20),
-        _buildDetailsCard(),
-      ],
-    );
-  }
-
-  Widget _buildThumbnailGallery() {
-    return SizedBox(
-      height: 80,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: product.images.map((img) {
-          return Container(
-            width: 70,
-            margin: const EdgeInsets.only(right: 10),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(img, fit: BoxFit.cover),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildDetailsCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(blurRadius: 20, color: Colors.black.withValues(alpha: 0.5)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CustomText(
-            title: product.title,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-          verticalSpace(10),
-
-          Row(
-            children: [
-              CustomText(title: "Brand: ${product.brand}", fontSize: 14),
-              verticalSpace(10),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(product.category),
-              ),
-            ],
-          ),
-          verticalSpace(20),
-          CustomText(
-            title: "\$${product.price.toStringAsFixed(2)}",
-            fontSize: 28,
-            color: Colors.green,
-            fontWeight: FontWeight.bold,
-          ),
-          if (product.discountPercentage > 0)
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: CustomText(
-                title: "Discount: ${product.discountPercentage}% OFF",
-                color: Palette.errorColor,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-
-          verticalSpace(20),
-          Row(
-            children: [
-              Icon(Icons.star, color: Colors.amber.shade600),
-              horizontalSpace(5),
-              CustomText(title: "${product.rating} / 5", fontSize: 14),
-              horizontalSpace(10),
               CustomText(
-                title: product.stock > 0 ? "In Stock" : "Out of Stock",
-                color: product.stock > 0 ? Colors.green : Colors.red,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+                title: product.title,
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
               ),
+
+              verticalSpace(8),
+              Text(
+                "${product.brand} • ${product.category}",
+                style: TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+
+              verticalSpace(25),
+
+              CustomText(
+                title: "\$${product.price.toStringAsFixed(2)}",
+                fontSize: 34,
+                color: Colors.cyanAccent,
+                fontWeight: FontWeight.w700,
+              ),
+
+              if (product.discountPercentage > 0)
+                Text(
+                  "${product.discountPercentage}% OFF",
+                  style: const TextStyle(
+                    color: Colors.redAccent,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+              verticalSpace(20),
+
+              Row(
+                children: [
+                  Icon(Icons.star, color: Colors.amber.shade400),
+                  horizontalSpace(5),
+                  Text(
+                    "${product.rating} / 5",
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                  horizontalSpace(15),
+                  Text(
+                    product.stock > 0 ? "In Stock" : "Out of Stock",
+                    style: TextStyle(
+                      color: product.stock > 0
+                          ? Colors.greenAccent
+                          : Colors.redAccent,
+                    ),
+                  ),
+                ],
+              ),
+
+              verticalSpace(30),
+
+              const _InfoTile(label: "Warranty"),
+              Text(
+                product.warrantyInformation,
+                style: const TextStyle(color: Colors.white70),
+              ),
+
+              verticalSpace(15),
+
+              const _InfoTile(label: "Shipping"),
+              Text(
+                product.shippingInformation,
+                style: const TextStyle(color: Colors.white70),
+              ),
+
+              verticalSpace(15),
+
+              const _InfoTile(label: "Return Policy"),
+              Text(
+                product.returnPolicy,
+                style: const TextStyle(color: Colors.white70),
+              ),
+
+              verticalSpace(40),
             ],
           ),
-
-          verticalSpace(10),
-          CustomText(
-            title: product.description,
-            fontSize: 14,
-            color: Colors.grey.shade700,
-          ),
-
-          verticalSpace(20),
-          _buildInfoTile("Warranty", product.warrantyInformation),
-          _buildInfoTile("Shipping Info", product.shippingInformation),
-          _buildInfoTile("Availability", product.availabilityStatus),
-          _buildInfoTile("Return Policy", product.returnPolicy),
-
-          verticalSpace(30),
-
-          CustomText(
-            title: "Reviews",
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
-
-          verticalSpace(10),
-
-          ...product.reviews.map((review) => _buildReviewCard(review)),
-        ],
+        ),
       ),
     );
   }
+}
 
-  Widget _buildInfoTile(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        children: [
-          CustomText(
-            title: "$title: ",
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+class _InfoTile extends StatelessWidget {
+  final String label;
+  const _InfoTile({required this.label});
 
-          Expanded(child: CustomText(title: value, fontSize: 14)),
-        ],
+  @override
+  Widget build(BuildContext context) {
+    return CustomText(
+      title: label,
+      fontSize: 16,
+      color: Colors.white,
+      fontWeight: FontWeight.w600,
+    );
+  }
+}
+
+class _DescriptionSection extends StatelessWidget {
+  final ProductModel product;
+  const _DescriptionSection(this.product);
+
+  @override
+  Widget build(BuildContext context) {
+    return _glassSection(
+      title: "Description",
+      child: Text(
+        product.description,
+        style: const TextStyle(
+          color: Colors.white70,
+          fontSize: 14,
+          height: 1.5,
+        ),
       ),
     );
   }
+}
 
-  Widget _buildReviewCard(ReviewModel review) {
+class _ReviewsSection extends StatelessWidget {
+  final List<ReviewModel> reviews;
+  const _ReviewsSection(this.reviews);
+
+  @override
+  Widget build(BuildContext context) {
+    return _glassSection(
+      title: "Customer Reviews",
+      child: Column(children: reviews.map((r) => _ReviewTile(r)).toList()),
+    );
+  }
+}
+
+class _ReviewTile extends StatelessWidget {
+  final ReviewModel r;
+  const _ReviewTile(this.r);
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
-        ],
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.white.withValues(alpha: 0.08),
       ),
+
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -230,18 +331,16 @@ class ProductDetails extends StatelessWidget {
             children: [
               ...List.generate(
                 5,
-                (index) => Icon(
-                  index < review.rating ? Icons.star : Icons.star_border,
+                (i) => Icon(
+                  i < r.rating ? Icons.star : Icons.star_border,
                   color: Colors.amber,
-                  size: 18,
+                  size: 16,
                 ),
               ),
-              horizontalSpace(8),
-              CustomText(
-                title: '${review.rating}/5',
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey.shade700,
+              horizontalSpace(10),
+              Text(
+                "${r.rating}/5",
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
             ],
           ),
@@ -252,31 +351,28 @@ class ProductDetails extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               CustomText(
-                title: review.reviewerName,
+                title: r.reviewerName,
                 fontSize: 16,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
               ),
-              CustomText(
-                title: _formatDate(review.date),
-                fontSize: 12,
-                color: Colors.grey.shade500,
+              Text(
+                _formatDate(r.date),
+                style: TextStyle(color: Colors.white54, fontSize: 12),
               ),
             ],
           ),
 
-          verticalSpace(4),
+          verticalSpace(6),
 
-          CustomText(
-            title: review.reviewerEmail,
-            fontSize: 12,
-            color: Colors.grey.shade600,
+          Text(
+            r.reviewerEmail,
+            style: const TextStyle(color: Colors.white38, fontSize: 12),
           ),
+
           verticalSpace(10),
-          CustomText(
-            title: review.comment,
-            fontSize: 14,
-            color: Colors.grey.shade800,
-          ),
+
+          Text(r.comment, style: const TextStyle(color: Colors.white70)),
         ],
       ),
     );
@@ -287,4 +383,39 @@ class ProductDetails extends StatelessWidget {
     if (d == null) return date;
     return "${d.day}/${d.month}/${d.year}";
   }
+}
+
+Widget _glassSection({required String title, required Widget child}) {
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(20),
+    child: BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          gradient: LinearGradient(
+            colors: [
+              Colors.white.withValues(alpha: 0.12),
+              Colors.white.withValues(alpha: 0.04),
+            ],
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CustomText(
+              title: title,
+              fontSize: 20,
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+            verticalSpace(14),
+            child,
+          ],
+        ),
+      ),
+    ),
+  );
 }

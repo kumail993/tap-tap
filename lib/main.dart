@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+
 import 'package:tap_task/app/app.dart';
 import 'package:tap_task/config/supabase/supabase_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SupabaseConfig.initialize();
+  usePathUrlStrategy();
   runApp(const MyApp());
 }

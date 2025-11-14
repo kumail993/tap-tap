@@ -1,8 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tap_task/config/constants/app_colors.dart';
-import 'package:tap_task/core/widgets/custom_button.dart';
 import 'package:tap_task/core/widgets/custom_searchfield.dart';
 import 'package:tap_task/core/widgets/custom_skeleton.dart';
 import 'package:tap_task/core/widgets/custom_text.dart';
@@ -20,100 +19,202 @@ class ProductsView extends StatefulWidget {
 
 class _ProductsViewState extends State<ProductsView> {
   late TextEditingController searchCtrl;
+
   @override
   void initState() {
     super.initState();
+    searchCtrl = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProductsBloc>().add(LoadProductsEvent());
     });
-    searchCtrl = TextEditingController();
   }
 
   void _onSearch(String value) {
-    context.read<ProductsBloc>().add(
-      SearchProductsEvent(query: searchCtrl.text),
-    );
+    context.read<ProductsBloc>().add(SearchProductsEvent(query: value));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: CustomIconButton(
-        minSize: Size(250, 51),
-        maxSize: Size(250, 51),
-        backgroundColor: Palette.blackColor,
-        textColor: Colors.white,
-        text: 'Add Product',
-        onPressed: () {
-          _showAddProductDialog(context);
-        },
-      ),
-      body: BlocBuilder<ProductsBloc, ProductsState>(
-        builder: (context, state) {
-          final products = state.filteredProducts;
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF0F172A), Color(0xFF020617)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
 
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              int crossAxisCount = 2;
+        child: SafeArea(
+          child: BlocBuilder<ProductsBloc, ProductsState>(
+            builder: (context, state) {
+              final products = state.filteredProducts;
 
-              if (constraints.maxWidth > 1200) {
-                crossAxisCount = 5;
-              } else if (constraints.maxWidth > 900) {
-                crossAxisCount = 4;
-              } else if (constraints.maxWidth > 600) {
-                crossAxisCount = 3;
-              }
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    CustomSearchField(
-                      controller: searchCtrl,
-                      placeholder: 'Search for a product',
-                      onChanged: _onSearch,
-                      onClear: (value) {
-                        _onSearch('');
-                      },
-                    ),
-                    verticalSpace(20),
-                    Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 1400),
-                        child: GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: products.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: crossAxisCount,
-                                crossAxisSpacing: 16,
-                                mainAxisSpacing: 16,
-                                childAspectRatio: 0.68,
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  int crossAxisCount = 2;
+                  if (constraints.maxWidth > 1300) {
+                    crossAxisCount = 5;
+                  } else if (constraints.maxWidth > 1000) {
+                    crossAxisCount = 4;
+                  } else if (constraints.maxWidth > 700) {
+                    crossAxisCount = 3;
+                  }
+
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1500),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 25,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                CustomText(
+                                  title: "Products",
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                                const Spacer(),
+                                _glassButton(
+                                  text: "Add Product",
+                                  onTap: () => _showAddProductDialog(context),
+                                ),
+                              ],
+                            ),
+
+                            verticalSpace(20),
+                            _glassPanel(
+                              child: CustomSearchField(
+                                controller: searchCtrl,
+                                placeholder:
+                                    'Search products by name or category...',
+                                onChanged: _onSearch,
+                                onClear: (_) => _onSearch(''),
                               ),
-                          itemBuilder: (context, index) {
-                            final product = products[index];
-                            return CustomSkeleton(
-                              enabled: state.isLoading,
-                              child: GestureDetector(
-                                onTap: () {
-                                  context.push(
-                                    '/productDetails',
-                                    extra: product,
-                                  );
-                                },
-                                child: ProductCard(product: product),
+                            ),
+
+                            verticalSpace(25),
+                            Expanded(
+                              child: _glassPanel(
+                                padding: const EdgeInsets.all(20),
+                                child: GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const BouncingScrollPhysics(),
+                                  itemCount: products.length,
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: crossAxisCount,
+                                        crossAxisSpacing: 22,
+                                        mainAxisSpacing: 22,
+                                        childAspectRatio: 0.66,
+                                      ),
+                                  itemBuilder: (context, index) {
+                                    final product = products[index];
+
+                                    return CustomSkeleton(
+                                      enabled: state.isLoading,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          context.push(
+                                            '/productDetails',
+                                            extra: product,
+                                          );
+                                        },
+                                        child: GlassProductCard(
+                                          product: product,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
-                            );
-                          },
+                            ),
+
+                            verticalSpace(25),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  );
+                },
               );
             },
-          );
-        },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _glassPanel({
+    required Widget child,
+    EdgeInsets padding = const EdgeInsets.all(16),
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.08),
+                Colors.white.withValues(alpha: 0.03),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  Widget _glassButton({required String text, required VoidCallback onTap}) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.white.withValues(alpha: 0.15),
+                  Colors.white.withValues(alpha: 0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.add_rounded, color: Colors.white, size: 20),
+                horizontalSpace(10),
+                CustomText(
+                  title: text,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -127,113 +228,116 @@ class _ProductsViewState extends State<ProductsView> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          backgroundColor: Palette.whiteColor,
-          surfaceTintColor: Palette.whiteColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          title: CustomText(title: 'Add Product', fontSize: 20),
-          content: Form(
-            key: formKey,
-            child: SizedBox(
-              width: 350,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CustomTextFormField(
-                    controller: nameCtrl,
-                    label: 'Product Name',
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter product name';
-                      }
-                      return null;
-                    },
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+              child: Container(
+                width: 420,
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.18),
                   ),
-                  verticalSpace(16),
-                  CustomTextFormField(
-                    controller: categoryCtrl,
-                    label: 'Category',
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter category';
-                      }
-                      return null;
-                    },
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white.withValues(alpha: 0.12),
+                      Colors.white.withValues(alpha: 0.05),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
+                ),
 
-                  verticalSpace(16),
-                  CustomTextFormField(
-                    controller: priceCtrl,
-                    label: 'Price',
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter price';
-                      }
-                      if (double.tryParse(value) == null) {
-                        return 'Price must be a valid number';
-                      }
-                      return null;
-                    },
-                  ),
-                ],
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CustomText(
+                      title: 'Add Product',
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+
+                    verticalSpace(22),
+
+                    Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
+                          CustomTextFormField(
+                            controller: nameCtrl,
+                            label: 'Product Name',
+
+                            validator: (v) =>
+                                v!.isEmpty ? "Enter product name" : null,
+                          ),
+                          verticalSpace(16),
+
+                          CustomTextFormField(
+                            controller: categoryCtrl,
+                            label: 'Category',
+                            validator: (v) =>
+                                v!.isEmpty ? "Enter category" : null,
+                          ),
+                          verticalSpace(16),
+
+                          CustomTextFormField(
+                            controller: priceCtrl,
+                            label: 'Price',
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Enter price';
+                              }
+                              if (double.tryParse(value) == null) {
+                                return 'Invalid number';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    verticalSpace(20),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _glassButton(
+                            text: "Cancel",
+                            onTap: () => Navigator.pop(context),
+                          ),
+                        ),
+                        horizontalSpace(16),
+                        Expanded(
+                          child: _glassButton(
+                            text: "Add",
+                            onTap: () {
+                              if (!formKey.currentState!.validate()) return;
+
+                              context.read<ProductsBloc>().add(
+                                AddProductEvent(
+                                  name: nameCtrl.text.trim(),
+                                  category: categoryCtrl.text.trim(),
+                                  price: priceCtrl.text.trim(),
+                                ),
+                              );
+
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-          actions: [
-            Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.black),
-                      ),
-                      child: CustomText(
-                        title: 'Close',
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-                horizontalSpace(10),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      context.read<ProductsBloc>().add(
-                        AddProductEvent(
-                          name: nameCtrl.text,
-                          category: categoryCtrl.text,
-                          price: priceCtrl.text,
-                        ),
-                      );
-                      context.pop();
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: CustomText(
-                        title: 'Add Product',
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
         );
       },
     );

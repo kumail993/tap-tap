@@ -1,5 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
-import 'package:tap_task/config/constants/app_colors.dart';
+import 'package:flutter/material.dart';
 
 class CustomSearchField extends StatelessWidget {
   final void Function(String)? onChanged;
@@ -33,7 +34,7 @@ class CustomSearchField extends StatelessWidget {
     this.backgroundColor,
     this.borderRadius,
     this.prefixIconColor,
-    this.color = Palette.blackColor,
+    this.color = Colors.white,
     this.fontSize = 14,
     this.fontWeight = FontWeight.w400,
     this.textAlign = TextAlign.start,
@@ -45,54 +46,79 @@ class CustomSearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoTextField(
-      enabled: isEnabled,
-      prefix: Padding(
-        padding: prefixIconPadding ?? const EdgeInsets.all(8.0),
-        child: Icon(
-          CupertinoIcons.search,
-          color: prefixIconColor ?? CupertinoColors.systemGrey,
-          size: prefixIconSize,
-        ),
-      ),
-      suffix: ValueListenableBuilder<TextEditingValue>(
-        valueListenable: controller ?? TextEditingController(),
-        builder: (context, value, child) {
-          return value.text.isNotEmpty
-              ? GestureDetector(
+    final ctrl = controller ?? TextEditingController();
+
+    return ClipRRect(
+      borderRadius: (borderRadius ?? BorderRadius.circular(18)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: (borderRadius ?? BorderRadius.circular(18)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.12),
+                Colors.white.withValues(alpha: 0.05),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: CupertinoTextField(
+            enabled: isEnabled,
+            controller: ctrl,
+            autofocus: autofocus,
+            onChanged: onChanged,
+            textInputAction: TextInputAction.search,
+            prefix: Padding(
+              padding: prefixIconPadding ?? const EdgeInsets.all(12.0),
+              child: Icon(
+                CupertinoIcons.search,
+                color: prefixIconColor ?? Colors.white.withValues(alpha: 0.7),
+                size: prefixIconSize ?? 20,
+              ),
+            ),
+            suffix: ValueListenableBuilder<TextEditingValue>(
+              valueListenable: ctrl,
+              builder: (context, value, child) {
+                if (value.text.isEmpty) return const SizedBox();
+                return GestureDetector(
                   onTap: () {
-                    controller!.clear();
-                    onClear!(value.text);
+                    ctrl.clear();
+                    if (onClear != null) onClear!(value.text);
                   },
                   child: const Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(12.0),
                     child: Icon(
                       CupertinoIcons.xmark_circle_fill,
                       color: CupertinoColors.systemGrey,
                     ),
                   ),
-                )
-              : const SizedBox();
-        },
-      ),
-      onChanged: onChanged,
-      textInputAction: TextInputAction.done,
-      padding:
-          padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-      controller: controller,
-      autofocus: autofocus,
-      placeholder: placeholder,
-      placeholderStyle: TextStyle(
-        fontFamily: 'GeneralSans',
-        fontWeight: fontWeight,
-        fontSize: fontSize,
-        height: lineHeight,
-        color: color,
-      ),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: borderRadius ?? BorderRadius.circular(15),
-        border: Border.all(color: Palette.darkGrayColor),
+                );
+              },
+            ),
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'GeneralSans',
+              fontWeight: fontWeight,
+              fontSize: fontSize,
+              height: lineHeight,
+            ),
+            placeholder: placeholder,
+            placeholderStyle: TextStyle(
+              color: Colors.white.withValues(alpha: 0.5),
+              fontFamily: 'GeneralSans',
+              fontSize: fontSize,
+              fontWeight: fontWeight,
+            ),
+            padding:
+                padding ??
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
+            cursorColor: Colors.white,
+            decoration: const BoxDecoration(color: Colors.transparent),
+          ),
+        ),
       ),
     );
   }

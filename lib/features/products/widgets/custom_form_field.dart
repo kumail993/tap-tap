@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:tap_task/core/imports/common_imports.dart';
-import 'package:tap_task/core/widgets/custom_text.dart';
-import 'package:tap_task/core/widgets/sizedbox.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController controller;
